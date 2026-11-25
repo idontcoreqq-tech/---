@@ -86,7 +86,7 @@ export async function askAiTutor(
 
   const geminiApiKey = settings.apiKey.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
 
-  if (settings.provider === 'gemini-3.5' && geminiApiKey) {
+  if (settings.provider === 'gemini-3.5' && geminiApiKey.startsWith('AIza')) {
     try {
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${encodeURIComponent(

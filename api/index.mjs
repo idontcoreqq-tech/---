@@ -186,12 +186,17 @@ export default async function handler(req, res) {
     }
 
     if (url === '/api/stripe/webhook' && req.method === 'POST') {
-      const rawBody = await readRawBody(req);
+      const rawBody =
+        typeof req.body === 'string'
+          ? req.body
+          : req.body && typeof req.body === 'object'
+          ? JSON.stringify(req.body)
+          : await readRawBody(req);
       const sig = req.headers['stripe-signature'];
       if (STRIPE_WEBHOOK_SECRET && !verifyStripeSignature(rawBody, String(sig || ''), STRIPE_WEBHOOK_SECRET)) {
         return res.status(400).json({ error: 'Invalid Stripe-Signature' });
       }
-      const event = JSON.parse(rawBody || '{}');
+      const event = typeof req.body === 'object' && req.body ? req.body : JSON.parse(rawBody || '{}');
       const eventId = event.id || `evt_${Date.now()}`;
       const eventType = event.type || 'unknown';
       if (pool) {
